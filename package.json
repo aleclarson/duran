@@ -1,5 +1,19 @@
 {
   "name": "duran",
   "version": "0.0.1",
-  "main": "js/index"
+  "main": "js/index",
+  "dependencies": {
+    "assertValid": "aleclarson/assertValid#1.0.1",
+    "denque": "^1.2.1",
+    "emitter": "aleclarson/emitter#1.0.0",
+    "msgpack-lite": "^0.1.26",
+    "noop": "aleclarson/noop#0.0.1"
+  },
+  "devDependencies": {
+    "coffeescript": "^2.2.0",
+    "debug": "^3.1.0"
+  },
+  "plugins": [
+    "lotus-coffee"
+  ]
 }

@@ -1,0 +1,12 @@
+{
+  "name": "duran",
+  "version": "0.0.2",
+  "main": "js/index",
+  "dependencies": {
+    "denque": "^1.2.1",
+    "emitter": "aleclarson/emitter#1.0.0",
+    "is-object": "^1.0.1",
+    "msgpack-lite": "^0.1.26",
+    "noop": "aleclarson/noop#0.0.1"
+  }
+}

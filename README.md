@@ -1,4 +1,4 @@
-# duran v0.0.1
+# duran v0.0.2
 
 NodeJS client driver for Tarantool 1.7+
 

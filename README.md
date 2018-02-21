@@ -1,8 +1,11 @@
-# duran v0.0.1
+# duran v0.0.2
 
 NodeJS client driver for Tarantool 1.7+
 
-**Why should I choose duran?** Utilizing the power of Tarantool functions, the `duran` client driver provides features not available in other drivers, like space management or index management. Not to mention a unique API with powerful query building.
+**Why should I choose duran?** Utilizing the power of Tarantool functions,
+the `duran` client driver provides features not available in other drivers,
+like space management or index management. Not to mention a unique API with
+powerful query building.
 
 You must install [duran-lua](https://github.com/aleclarson/duran-lua) to use this library.
 
@@ -63,15 +66,20 @@ Available events:
 
 The "connect" event occurs *after* the user is authenticated.
 
-Requests made before the "connect" event are placed in a queue that will be processed upon successful connection.
+Requests made before the "connect" event are placed in a queue that will be
+processed upon successful connection.
 
-When a "disconnect" event occurs and requests exist that were sent but not resolved, those requests will be resent upon reconnection. There is an exception to that rule; write queries will throw an error if a disconnect occurs before they resolve.
+When a "disconnect" event occurs and requests exist that were sent but not resolved,
+those requests will be resent upon reconnection. There is an exception to that rule;
+write queries will throw an error if a disconnect occurs before they resolve.
 
-After a "disconnect" event, attempts will be made to reconnect. After each failed attempt, the delay is increased exponentially, up to 2 minutes between attempts.
+After a "disconnect" event, attempts will be made to reconnect. After each failed
+attempt, the delay is increased exponentially, up to 2 minutes between attempts.
 
 ### box.call(func, ...args)
 
-Calling a stored procedure is simple! The returned promise resolves into a tuple. If the tuple has a length of 1 or 0, its first value is returned instead of the tuple.
+Calling a stored procedure is simple! The returned promise resolves into a tuple.
+If the tuple has a length of 1 or 0, its first value is returned instead of the tuple.
 
 ```js
 let info = await box.call('box.schema.user.info')
@@ -79,7 +87,8 @@ let info = await box.call('box.schema.user.info')
 
 ### box.space(name)
 
-Get a `Space` object. The returned space may not exist on the Tarantool server. The `box.space` method is pure, which means the returned space is always the same object.
+Get a `Space` object. The returned space may not exist on the Tarantool server.
+The `box.space` method is pure, which means the returned space is always the same object.
 
 ### space.create(opts)
 
@@ -87,7 +96,8 @@ Create the space on the Tarantool server. The user must be privileged.
 
 The available options can be found [here](https://tarantool.org/en/doc/1.7/book/box/box_schema.html#box-schema-space-create).
 
-You cannot call any other methods on the space until the returned promise is resolved, because you will need the space ID from the Tarantool server.
+You cannot call any other methods on the space until the returned promise is
+resolved, because you will need the space ID from the Tarantool server.
 
 ```js
 await box.space('test').create({
@@ -100,9 +110,13 @@ await box.space('test').create({
 
 Rename the space. The user must be privileged.
 
-You shoult not call `box.space(old_name)` until the returned promise is resolved. Otherwise, you'll get the renamed space, because the schema is not updated until the promise resolves without error.
+You should not call `box.space(old_name)` until the returned promise is resolved.
+Otherwise, you'll get the renamed space, because the schema is not updated until
+the promise resolves without error.
 
-Similarly, you should not call `box.space(new_name)` until the returned promise is resolved. Otherwise, you'll get a new `Space` object that will be overwritten by the renamed space.
+Similarly, you should not call `box.space(new_name)` until the returned promise
+is resolved. Otherwise, you'll get a new `Space` object that will be overwritten
+by the renamed space.
 
 ```js
 let space = box.space('test')
@@ -141,7 +155,8 @@ The `empty` method is identical.
 
 Destroy the space (and all tuples contained within). The user must be privileged.
 
-If you intend to create a space with the same name immediately after, you must wait for the returned promise to resolve before calling `space.create`.
+If you intend to create a space with the same name immediately after, you must
+wait for the returned promise to resolve before calling `space.create`.
 
 ```js
 // Recreate the "test" space.
@@ -182,6 +197,12 @@ The `opts` object is identical to the `space.createIndex` options.
 
 Destroy an index of the space. The user must be privileged.
 
+You should not create an index with the same name *until* the returned
+promise is resolved. Otherwise, an error will be thrown, because the
+local schema is not yet updated.
+
+&nbsp;
+
 ## Queries
 
 The `run`, `then`, and `catch` methods exist on all query-like objects.
@@ -213,7 +234,12 @@ Sort all tuples in descending order using an index.
 let tuples = await space.desc('name').run()
 ```
 
+Omit the `index_name` argument to use the primary index.
+
+```js
+let tuples = await space.desc().run()
+```
+
 ---
 
 *More documentation coming soon...*
-

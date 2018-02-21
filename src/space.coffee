@@ -84,7 +84,7 @@ extend Space,
 
     @_exists()
     index = @_getIndex name
-    await @_box.call "duran.index_rename", @id, name, new_name
+    await @_box.call "duran.index_rename", @id, index.id, new_name
 
     @_indexMap[new_name] = index
     delete @_indexMap[name]

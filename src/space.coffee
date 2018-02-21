@@ -1,5 +1,5 @@
 {alias, extend, set, unimpl} = require "./utils"
-assertValid = require "assertValid"
+isObject = require "is-object"
 Range = require "./query/range"
 Tuple = require "./query/tuple"
 
@@ -17,27 +17,42 @@ Space = (name, box) ->
 extend Space,
 
   create: (opts = {}) ->
-    assertValid opts, "object"
+    unless isObject opts
+      throw TypeError "Expected an object"
+
+    if @id isnt null
+      throw Error "Space named '#{@name}' already exists"
+
     @id = await @_box.call "duran.space_create", @name, opts
     @_indexMap = {}
     @_fieldCount = 0
-    return
+
+    return this
 
   rename: (name) ->
-    assertValid name, "string"
-    throw Error "Unknown space: '#{@name}'" if @id is null
+    if typeof name isnt "string"
+      throw TypeError "Expected a string"
+
+    @_exists()
     await @_box.call "duran.space_rename", @id, name
+
     @_box._schema.renameSpace @name, name
     @name = name
     return
 
   format: (format) ->
+    unless Array.isArray format
+      throw TypeError "Expected an array"
+
+    @_exists()
     @_box.call "duran.space_format", @id, format
 
   truncate: ->
+    @_exists()
     @_box.call "duran.space_truncate", @id
 
   drop: ->
+    @_exists()
     await @_box.call "duran.space_drop", @id
     @_box._schema.deleteSpace @name
 
@@ -46,6 +61,11 @@ extend Space,
 #
 
   createIndex: (name, opts) ->
+    if typeof name isnt "string"
+      throw TypeError "`name` must be a string"
+    unless isObject opts
+      throw TypeError "`opts` must be an object"
+
     @_exists()
 
     if @_indexMap[name]
@@ -57,21 +77,36 @@ extend Space,
     return
 
   renameIndex: (name, new_name) ->
+    if typeof name isnt "string"
+      throw TypeError "`name` must be a string"
+    if typeof new_name isnt "string"
+      throw TypeError "`new_name` must be a string"
+
     @_exists()
     index = @_getIndex name
     await @_box.call "duran.index_rename", @id, name, new_name
+
     @_indexMap[new_name] = index
     delete @_indexMap[name]
 
   alterIndex: (name, opts) ->
+    if typeof name isnt "string"
+      throw TypeError "`name` must be a string"
+    unless isObject opts
+      throw TypeError "`opts` must be an object"
+
     @_exists()
     index = @_getIndex name
     @_box.call "duran.index_alter", @id, index.id
 
   dropIndex: (name) ->
+    if typeof name isnt "string"
+      throw TypeError "`name` must be a string"
+
     @_exists()
     index = @_getIndex name
     await @_box.call "duran.index_drop", @id, index.id
+
     delete @_indexMap[name]
 
 #
